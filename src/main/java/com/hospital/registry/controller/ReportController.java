@@ -47,4 +47,27 @@ public class ReportController {
         model.addAttribute("to", to);
         return "reports/vouchers";
     }
+
+    @GetMapping("/diagnoses")
+    public String diagnoses(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            Model model) {
+
+        if (from == null) from = LocalDate.now().minusYears(1);
+        if (to == null) to = LocalDate.now();
+
+        model.addAttribute("stats", reportService.getDiagnosisStats(from, to));
+        model.addAttribute("from", from);
+        model.addAttribute("to", to);
+        return "reports/diagnoses";
+    }
+
+    @GetMapping("/privileges")
+    public String privileges(Model model) {
+        model.addAttribute("stats", reportService.getPrivilegeStats());
+        model.addAttribute("total", reportService.getPrivilegeStats().stream()
+                .mapToLong(row -> (Long) row[1]).sum());
+        return "reports/privileges";
+    }
 }

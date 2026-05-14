@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Выписка из ЭМК</title>
+    <style>
+        body { font-family: "Times New Roman", serif; font-size: 11pt; margin: 1cm 2cm; color: #000; }
+        h2 { font-size: 14pt; text-align: center; margin-bottom: 4px; }
+        .subtitle { text-align: center; font-size: 10pt; color: #555; margin-bottom: 16px; }
+        .patient-info { border: 1px solid #999; padding: 10px 14px; margin-bottom: 16px; }
+        .patient-info dl { display: grid; grid-template-columns: 160px 1fr; gap: 2px 8px; margin: 0; }
+        .patient-info dt { font-weight: bold; }
+        .patient-info dd { margin: 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 10pt; }
+        th { background: #e0e0e0; border: 1px solid #999; padding: 5px 6px; text-align: left; }
+        td { border: 1px solid #ccc; padding: 4px 6px; vertical-align: top; }
+        .record-block { page-break-inside: avoid; }
+        h3 { font-size: 11pt; margin: 16px 0 4px; border-bottom: 1px solid #999; }
+        .footer { margin-top: 30px; font-size: 10pt; }
+        .print-btn { position: fixed; top: 10px; right: 10px; padding: 6px 16px;
+            background: #0d6efd; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 12pt; }
+        @media print { .print-btn { display: none; } }
+    </style>
+</head>
+<body>
+<button class="print-btn" onclick="window.print()">Печать</button>
+
+<h2>ВЫПИСКА ИЗ ЭЛЕКТРОННОЙ МЕДИЦИНСКОЙ КАРТЫ</h2>
+<p class="subtitle"
+   th:text="${from != null || to != null} ? 'Период: ' + (from != null ? #temporals.format(from,'dd.MM.yyyy') : '...') + ' — ' + (to != null ? #temporals.format(to,'dd.MM.yyyy') : #temporals.format(#temporals.createNow(),'dd.MM.yyyy')) : 'Все записи'"></p>
+
+<div class="patient-info">
+    <dl>
+        <dt>ФИО</dt>         <dd th:text="${patient.fullName}"></dd>
+        <dt>УИН</dt>         <dd th:text="${patient.uin}"></dd>
+        <dt>Дата рождения</dt><dd th:text="${#temporals.format(patient.birthDate,'dd.MM.yyyy')}"></dd>
+        <dt>Пол</dt>         <dd th:text="${patient.gender?.displayName ?: '—'}"></dd>
+        <dt>Участок</dt>     <dd th:text="${patient.section?.name ?: '—'}"></dd>
+        <dt>Страховой полис</dt>
+        <dd th:text="${patient.insuranceType != null ? patient.insuranceType.displayName + ' № ' + (patient.insuranceNumber ?: '') : '—'}"></dd>
+        <dt>Аллергии</dt>    <dd th:text="${patient.allergies ?: '—'}"></dd>
+        <dt>Спецотметки</dt> <dd th:text="${patient.specialNotes ?: '—'}"></dd>
+    </dl>
+</div>
+
+<div th:if="${records.empty}" style="text-align:center;color:#888;margin:20px">Записей нет</div>
+
+<div th:each="r : ${records}" class="record-block">
+    <h3 th:text="'Приём ' + ${#temporals.format(r.visitDate,'dd.MM.yyyy')} + (r.doctor != null ? ' — ' + r.doctor.fullName : '')"></h3>
+    <table>
+        <tr th:if="${r.icdCode != null}">
+            <th style="width:30%">Код МКБ-10</th>
+            <td th:text="${r.icdCode}"></td>
+        </tr>
+        <tr th:if="${r.diagnosis != null}">
+            <th>Диагноз</th>
+            <td th:text="${r.diagnosis}"></td>
+        </tr>
+        <tr th:if="${r.complaints != null}">
+            <th>Жалобы</th>
+            <td th:text="${r.complaints}"></td>
+        </tr>
+        <tr th:if="${r.treatment != null}">
+            <th>Лечение</th>
+            <td th:text="${r.treatment}"></td>
+        </tr>
+        <tr th:if="${r.notes != null}">
+            <th>Примечания</th>
+            <td th:text="${r.notes}"></td>
+        </tr>
+    </table>
+</div>
+
+<div class="footer">
+    <p>Выписка сформирована: <span th:text="${#temporals.format(#temporals.createNow(),'dd.MM.yyyy HH:mm')}"></span></p>
+    <p>Подпись: _______________________&nbsp;&nbsp;&nbsp;&nbsp;Штамп учреждения</p>
+</div>
+</body>
+</html>

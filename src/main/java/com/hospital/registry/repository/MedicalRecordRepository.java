@@ -31,4 +31,28 @@ public interface MedicalRecordRepository extends JpaRepository<MedicalRecord, Lo
     List<MedicalRecord> findByVisitDateBetween(LocalDate from, LocalDate to);
 
     long countByDoctorIdAndVisitDateBetween(Long doctorId, LocalDate from, LocalDate to);
+
+    @org.springframework.data.jpa.repository.Query("""
+        SELECT r FROM MedicalRecord r
+        WHERE r.patient.id = :patientId AND r.archived = false
+        AND (:from IS NULL OR r.visitDate >= :from)
+        AND (:to   IS NULL OR r.visitDate <= :to)
+        ORDER BY r.visitDate DESC
+        """)
+    List<MedicalRecord> findForExtract(
+        @org.springframework.data.repository.query.Param("patientId") Long patientId,
+        @org.springframework.data.repository.query.Param("from") LocalDate from,
+        @org.springframework.data.repository.query.Param("to") LocalDate to);
+
+    @org.springframework.data.jpa.repository.Query("""
+        SELECT r.icdCode, r.diagnosis, COUNT(r)
+        FROM MedicalRecord r
+        WHERE r.archived = false AND r.icdCode IS NOT NULL
+        AND r.visitDate BETWEEN :from AND :to
+        GROUP BY r.icdCode, r.diagnosis
+        ORDER BY COUNT(r) DESC
+        """)
+    List<Object[]> getDiagnosisStats(
+        @org.springframework.data.repository.query.Param("from") LocalDate from,
+        @org.springframework.data.repository.query.Param("to") LocalDate to);
 }

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head><title>Льготные категории</title></head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Отчёт: Льготные категории пациентов</h2>
+        <button type="button" class="btn btn-outline-secondary" onclick="window.print()">Печать</button>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Категория</th>
+                        <th class="text-end">Пациентов</th>
+                        <th class="text-end">% от общего</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="row : ${stats}">
+                        <td th:text="${row[0]?.displayName ?: '—'}"></td>
+                        <td class="text-end fw-bold" th:text="${row[1]}"></td>
+                        <td class="text-end text-muted"
+                            th:text="${total > 0 ? #numbers.formatDecimal(row[1] * 100.0 / total, 1, 1) + '%' : '—'}"></td>
+                    </tr>
+                    <tr th:if="${stats.isEmpty()}">
+                        <td colspan="3" class="text-center text-muted">Нет данных</td>
+                    </tr>
+                    </tbody>
+                    <tfoot th:if="${!stats.isEmpty()}">
+                    <tr class="table-secondary fw-bold">
+                        <td>Итого</td>
+                        <td class="text-end" th:text="${total}"></td>
+                        <td class="text-end">100%</td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-md-6" th:if="${!stats.isEmpty()}">
+            <div class="card">
+                <div class="card-body">
+                    <div th:each="row : ${stats}" class="mb-2">
+                        <div class="d-flex justify-content-between mb-1">
+                            <small th:text="${row[0]?.displayName ?: '—'}"></small>
+                            <small class="text-muted" th:text="${row[1]} + ' чел.'"></small>
+                        </div>
+                        <div class="progress" style="height: 18px;">
+                            <div class="progress-bar"
+                                 th:style="${'width: ' + (total > 0 ? row[1] * 100 / total : 0) + '%'}"
+                                 th:text="${total > 0 ? #numbers.formatDecimal(row[1] * 100.0 / total, 1, 1) + '%' : ''}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

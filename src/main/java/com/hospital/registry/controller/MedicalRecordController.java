@@ -115,4 +115,22 @@ public class MedicalRecordController {
         model.addAttribute("records", recordService.getArchive(pageable));
         return "emr/archive";
     }
+
+    @GetMapping("/records/{id}/voucher")
+    public String printVoucher(@PathVariable Long id, Model model) {
+        model.addAttribute("record", recordService.getById(id));
+        return "emr/print-voucher";
+    }
+
+    @GetMapping("/patients/{patientId}/records/extract")
+    public String printExtract(@PathVariable Long patientId,
+                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+                               Model model) {
+        model.addAttribute("patient", patientService.getById(patientId));
+        model.addAttribute("records", recordService.getForExtract(patientId, from, to));
+        model.addAttribute("from", from);
+        model.addAttribute("to", to);
+        return "emr/print-extract";
+    }
 }

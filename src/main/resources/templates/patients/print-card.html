@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Карточка пациента</title>
+    <style>
+        body { font-family: "Times New Roman", serif; font-size: 11pt; margin: 1cm 2cm; color: #000; }
+        h2 { font-size: 14pt; text-align: center; margin-bottom: 2px; }
+        .subtitle { text-align: center; font-size: 10pt; color: #555; margin-bottom: 20px; }
+        .uin { text-align: center; font-size: 13pt; font-weight: bold; letter-spacing: 2px; margin-bottom: 16px; }
+        table { width: 100%; border-collapse: collapse; }
+        td { padding: 5px 8px; border: 1px solid #999; vertical-align: top; }
+        td:first-child { font-weight: bold; width: 35%; background: #f8f8f8; }
+        .section-header { background: #d0d0d0; font-weight: bold; text-align: center; }
+        .alerts { border: 2px solid #c00; padding: 8px 12px; margin: 14px 0; color: #c00; font-weight: bold; }
+        .footer { margin-top: 30px; display: flex; justify-content: space-between; font-size: 10pt; }
+        .print-btn { position: fixed; top: 10px; right: 10px; padding: 6px 16px;
+            background: #0d6efd; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 12pt; }
+        @media print { .print-btn { display: none; } }
+    </style>
+</head>
+<body>
+<button class="print-btn" onclick="window.print()">Печать</button>
+
+<h2>КАРТОЧКА АМБУЛАТОРНОГО ПАЦИЕНТА</h2>
+<p class="subtitle">Форма 025/у-04</p>
+<div class="uin" th:text="'УИН: ' + ${patient.uin}"></div>
+
+<div th:if="${patient.allergies != null}" class="alerts">
+    ⚠ АЛЛЕРГИИ: <span th:text="${patient.allergies}"></span>
+</div>
+<div th:if="${patient.specialNotes != null}" class="alerts" style="border-color:#e60; color:#e60;">
+    ⚠ СПЕЦОТМЕТКИ: <span th:text="${patient.specialNotes}"></span>
+</div>
+
+<table>
+    <tr><td colspan="2" class="section-header">Персональные данные</td></tr>
+    <tr><td>Фамилия</td><td th:text="${patient.lastName}"></td></tr>
+    <tr><td>Имя</td><td th:text="${patient.firstName}"></td></tr>
+    <tr><td>Отчество</td><td th:text="${patient.middleName ?: '—'}"></td></tr>
+    <tr><td>Дата рождения</td><td th:text="${#temporals.format(patient.birthDate,'dd.MM.yyyy')}"></td></tr>
+    <tr><td>Пол</td><td th:text="${patient.gender?.displayName ?: '—'}"></td></tr>
+    <tr><td>Телефон</td><td th:text="${patient.phone ?: '—'}"></td></tr>
+    <tr><td>Email</td><td th:text="${patient.email ?: '—'}"></td></tr>
+    <tr><td>Адрес</td><td th:text="${patient.address ?: '—'}"></td></tr>
+
+    <tr><td colspan="2" class="section-header">Паспортные данные</td></tr>
+    <tr><td>Серия / Номер</td>
+        <td th:text="${(patient.passportSeries ?: '') + ' ' + (patient.passportNumber ?: '')}"></td></tr>
+    <tr><td>Дата выдачи</td>
+        <td th:text="${patient.passportIssueDate != null ? #temporals.format(patient.passportIssueDate,'dd.MM.yyyy') : '—'}"></td></tr>
+    <tr><td>Кем выдан</td><td th:text="${patient.passportIssuedBy ?: '—'}"></td></tr>
+
+    <tr><td colspan="2" class="section-header">Страхование и льготы</td></tr>
+    <tr><td>Страховой полис</td>
+        <td th:text="${patient.insuranceType != null ? patient.insuranceType.displayName + ' № ' + (patient.insuranceNumber ?: '') : '—'}"></td></tr>
+    <tr><td>Льготная категория</td><td th:text="${patient.privilegeCategory?.displayName ?: '—'}"></td></tr>
+
+    <tr><td colspan="2" class="section-header">Участок</td></tr>
+    <tr><td>Участок</td><td th:text="${patient.section?.name ?: '—'}"></td></tr>
+    <tr><td>Врач участка</td><td th:text="${patient.section?.doctor?.fullName ?: '—'}"></td></tr>
+
+    <tr><td colspan="2" class="section-header">Дата постановки на учёт</td></tr>
+    <tr><td>Зарегистрирован</td>
+        <td th:text="${#temporals.format(patient.createdAt,'dd.MM.yyyy')}"></td></tr>
+</table>
+
+<div class="footer">
+    <span>Подпись регистратора: _______________________</span>
+    <span>Штамп учреждения</span>
+</div>
+</body>
+</html>

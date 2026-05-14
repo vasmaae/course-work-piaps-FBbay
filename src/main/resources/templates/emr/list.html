@@ -12,6 +12,7 @@
         </div>
         <div class="d-flex gap-2">
             <a th:href="@{/patients/{id}(id=${patient.id})}" class="btn btn-outline-secondary">← Пациент</a>
+            <a th:href="@{/patients/{id}/records/extract(id=${patient.id})}" target="_blank" class="btn btn-outline-secondary">🖨 Выписка</a>
             <a th:href="@{/patients/{id}/records/new(id=${patient.id})}" class="btn btn-success">+ Запись</a>
         </div>
     </div>
@@ -54,6 +55,7 @@
                 <td th:text="${r.doctor?.fullName ?: '—'}"></td>
                 <td th:text="${r.complaints != null && r.complaints.length() > 60 ? r.complaints.substring(0,60) + '...' : (r.complaints ?: '—')}"></td>
                 <td class="text-nowrap">
+                    <a th:href="@{/records/{id}/voucher(id=${r.id})}" target="_blank" class="btn btn-sm btn-outline-secondary" title="Статистический талон">🖨</a>
                     <a th:href="@{/records/{id}/edit(id=${r.id})}" class="btn btn-sm btn-outline-primary">Ред.</a>
                     <form th:action="@{/records/{id}/archive(id=${r.id})}" method="post" class="d-inline">
                         <button class="btn btn-sm btn-outline-danger"

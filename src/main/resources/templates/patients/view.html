@@ -13,6 +13,7 @@
         <div class="d-flex gap-2">
             <a th:href="@{/patients/{id}/edit(id=${patient.id})}" class="btn btn-primary">Редактировать</a>
             <a th:href="@{/patients/{id}/records(id=${patient.id})}" class="btn btn-outline-info">ЭМК</a>
+            <a th:href="@{/patients/{id}/card(id=${patient.id})}" target="_blank" class="btn btn-outline-secondary">🖨 Карточка</a>
             <form th:action="@{/patients/{id}/archive(id=${patient.id})}" method="post"
                   onsubmit="return confirm('Переместить пациента в архив?')">
                 <button type="submit" class="btn btn-outline-danger">В архив</button>

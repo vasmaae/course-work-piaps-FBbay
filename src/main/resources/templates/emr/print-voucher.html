@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Статистический талон</title>
+    <style>
+        body { font-family: "Times New Roman", serif; font-size: 12pt; margin: 1cm 2cm; color: #000; }
+        h2 { font-size: 14pt; text-align: center; margin-bottom: 4px; }
+        .subtitle { text-align: center; font-size: 10pt; color: #555; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        td { padding: 5px 8px; border: 1px solid #999; vertical-align: top; }
+        td:first-child { font-weight: bold; width: 38%; background: #f8f8f8; }
+        .section-header { background: #e0e0e0; font-weight: bold; text-align: center; }
+        .footer { margin-top: 30px; display: flex; justify-content: space-between; font-size: 10pt; }
+        .print-btn { position: fixed; top: 10px; right: 10px; padding: 6px 16px;
+            background: #0d6efd; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 12pt; }
+        @media print {
+            .print-btn { display: none; }
+            body { margin: 1cm 1.5cm; }
+        }
+    </style>
+</head>
+<body>
+<button class="print-btn" onclick="window.print()">Печать</button>
+
+<h2>СТАТИСТИЧЕСКИЙ ТАЛОН</h2>
+<p class="subtitle">Форма 025-12/у &nbsp;|&nbsp; Амбулаторный приём</p>
+
+<table>
+    <tr><td colspan="2" class="section-header">I. Сведения о пациенте</td></tr>
+    <tr>
+        <td>ФИО пациента</td>
+        <td th:text="${record.patient.fullName}"></td>
+    </tr>
+    <tr>
+        <td>УИН</td>
+        <td th:text="${record.patient.uin}"></td>
+    </tr>
+    <tr>
+        <td>Дата рождения</td>
+        <td th:text="${#temporals.format(record.patient.birthDate, 'dd.MM.yyyy')}"></td>
+    </tr>
+    <tr>
+        <td>Пол</td>
+        <td th:text="${record.patient.gender?.displayName ?: '—'}"></td>
+    </tr>
+    <tr>
+        <td>Страховой полис</td>
+        <td th:text="${record.patient.insuranceType != null ? record.patient.insuranceType.displayName + ' № ' + (record.patient.insuranceNumber ?: '') : '—'}"></td>
+    </tr>
+    <tr>
+        <td>Льготная категория</td>
+        <td th:text="${record.patient.privilegeCategory?.displayName ?: '—'}"></td>
+    </tr>
+    <tr>
+        <td>Участок</td>
+        <td th:text="${record.patient.section?.name ?: '—'}"></td>
+    </tr>
+
+    <tr><td colspan="2" class="section-header">II. Сведения о приёме</td></tr>
+    <tr>
+        <td>Дата приёма</td>
+        <td th:text="${#temporals.format(record.visitDate, 'dd.MM.yyyy')}"></td>
+    </tr>
+    <tr>
+        <td>Врач</td>
+        <td th:text="${record.doctor?.fullName ?: '—'}"></td>
+    </tr>
+    <tr>
+        <td>Специализация</td>
+        <td th:text="${record.doctor?.specialization ?: '—'}"></td>
+    </tr>
+
+    <tr><td colspan="2" class="section-header">III. Диагноз</td></tr>
+    <tr>
+        <td>Код МКБ-10</td>
+        <td th:text="${record.icdCode ?: '—'}"></td>
+    </tr>
+    <tr>
+        <td>Диагноз</td>
+        <td th:text="${record.diagnosis ?: '—'}"></td>
+    </tr>
+    <tr>
+        <td>Жалобы</td>
+        <td th:text="${record.complaints ?: '—'}"></td>
+    </tr>
+    <tr>
+        <td>Назначено лечение</td>
+        <td th:text="${record.treatment ?: '—'}"></td>
+    </tr>
+    <tr>
+        <td>Примечания</td>
+        <td th:text="${record.notes ?: '—'}"></td>
+    </tr>
+
+    <tr><td colspan="2" class="section-header">IV. Служебные отметки</td></tr>
+    <tr>
+        <td>Запись создана</td>
+        <td th:text="${record.createdBy?.fullName ?: '—'}"></td>
+    </tr>
+    <tr>
+        <td>Дата создания</td>
+        <td th:text="${#temporals.format(record.createdAt, 'dd.MM.yyyy HH:mm')}"></td>
+    </tr>
+</table>
+
+<div class="footer">
+    <span>Подпись врача: _______________________</span>
+    <span>Штамп учреждения</span>
+</div>
+</body>
+</html>

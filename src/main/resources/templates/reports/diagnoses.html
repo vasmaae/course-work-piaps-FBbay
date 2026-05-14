@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head><title>Статистика по МКБ</title></head>
+<body>
+<div layout:fragment="content">
+    <h2>Отчёт: Статистика по диагнозам (МКБ-10)</h2>
+
+    <form method="get" class="row g-2 mt-2 mb-4 align-items-end">
+        <div class="col-auto">
+            <label class="form-label">С</label>
+            <input type="date" name="from" th:value="${from}" class="form-control">
+        </div>
+        <div class="col-auto">
+            <label class="form-label">По</label>
+            <input type="date" name="to" th:value="${to}" class="form-control">
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Сформировать</button>
+        </div>
+        <div class="col-auto">
+            <button type="button" class="btn btn-outline-secondary" onclick="window.print()">Печать</button>
+        </div>
+    </form>
+
+    <p class="text-muted" th:if="${!stats.isEmpty()}"
+       th:text="'Период: ' + ${#temporals.format(from,'dd.MM.yyyy')} + ' — ' + ${#temporals.format(to,'dd.MM.yyyy')} + '. Уникальных диагнозов: ' + ${stats.size()}"></p>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="table-light">
+            <tr>
+                <th style="width:5%">#</th>
+                <th style="width:12%">Код МКБ-10</th>
+                <th>Диагноз</th>
+                <th style="width:15%" class="text-end">Кол-во приёмов</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="row, stat : ${stats}">
+                <td th:text="${stat.count}"></td>
+                <td><span class="badge bg-secondary" th:text="${row[0]}"></span></td>
+                <td th:text="${row[1] ?: '—'}"></td>
+                <td class="text-end fw-bold" th:text="${row[2]}"></td>
+            </tr>
+            <tr th:if="${stats.isEmpty()}">
+                <td colspan="4" class="text-center text-muted">Нет данных за выбранный период</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PatientRepository extends JpaRepository<Patient, Long> {
@@ -39,4 +40,7 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
     Page<Patient> findByArchivedTrue(Pageable pageable);
 
     long countByArchivedFalse();
+
+    @Query("SELECT p.privilegeCategory, COUNT(p) FROM Patient p WHERE p.archived = false GROUP BY p.privilegeCategory ORDER BY COUNT(p) DESC")
+    List<Object[]> getPrivilegeStats();
 }

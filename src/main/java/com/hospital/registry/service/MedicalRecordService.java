@@ -14,10 +14,10 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -83,6 +83,11 @@ public class MedicalRecordService {
         MedicalRecord saved = recordRepository.save(existing);
         auditService.log("MedicalRecord", id, "UPDATE", old, saved.getDiagnosis());
         return saved;
+    }
+
+    @Transactional(readOnly = true)
+    public List<MedicalRecord> getForExtract(Long patientId, LocalDate from, LocalDate to) {
+        return recordRepository.findForExtract(patientId, from, to);
     }
 
     @Transactional

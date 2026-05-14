@@ -142,4 +142,10 @@ public class PatientController {
         ra.addFlashAttribute("success", "Пациент восстановлен.");
         return "redirect:/patients/" + id;
     }
+
+    @GetMapping("/{id}/card")
+    public String printCard(@PathVariable Long id, Model model) {
+        model.addAttribute("patient", patientService.getById(id));
+        return "patients/print-card";
+    }
 }
