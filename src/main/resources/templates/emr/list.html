@@ -67,6 +67,28 @@
             </tbody>
         </table>
     </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-2">
+        <small class="text-muted" th:text="'Записей: ' + ${records.totalElements}"></small>
+        <nav th:if="${records.totalPages > 1}">
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item" th:classappend="${records.first} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/patients/{id}/records(id=${patient.id}, from=${from}, to=${to}, doctorId=${selectedDoctorId}, page=${records.number - 1})}">«</a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, records.totalPages - 1)}"
+                    th:classappend="${i == records.number} ? 'active'">
+                    <a class="page-link"
+                       th:href="@{/patients/{id}/records(id=${patient.id}, from=${from}, to=${to}, doctorId=${selectedDoctorId}, page=${i})}"
+                       th:text="${i + 1}"></a>
+                </li>
+                <li class="page-item" th:classappend="${records.last} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/patients/{id}/records(id=${patient.id}, from=${from}, to=${to}, doctorId=${selectedDoctorId}, page=${records.number + 1})}">»</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
 </div>
 </body>
 </html>

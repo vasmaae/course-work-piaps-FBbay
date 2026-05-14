@@ -32,7 +32,7 @@ public class MedicalRecordController {
                        @RequestParam(required = false) Long doctorId,
                        @RequestParam(defaultValue = "0") int page,
                        Model model) {
-        var pageable = PageRequest.of(page, 20, Sort.by("visitDate").descending());
+        var pageable = PageRequest.of(page, 5, Sort.by("visitDate").descending());
         model.addAttribute("patient", patientService.getById(patientId));
         model.addAttribute("records", recordService.getByPatient(patientId, from, to, doctorId, pageable));
         model.addAttribute("doctors", doctorService.getAll());

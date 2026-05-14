@@ -34,6 +34,24 @@
             </tbody>
         </table>
     </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-2">
+        <small class="text-muted" th:text="'Записей: ' + ${logs.totalElements}"></small>
+        <nav th:if="${logs.totalPages > 1}">
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item" th:classappend="${logs.first} ? 'disabled'">
+                    <a class="page-link" th:href="@{/admin/audit(page=${logs.number - 1})}">«</a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, logs.totalPages - 1)}"
+                    th:classappend="${i == logs.number} ? 'active'">
+                    <a class="page-link" th:href="@{/admin/audit(page=${i})}" th:text="${i + 1}"></a>
+                </li>
+                <li class="page-item" th:classappend="${logs.last} ? 'disabled'">
+                    <a class="page-link" th:href="@{/admin/audit(page=${logs.number + 1})}">»</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
 </div>
 </body>
 </html>

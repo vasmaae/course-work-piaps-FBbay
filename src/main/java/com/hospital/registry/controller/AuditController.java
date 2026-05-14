@@ -19,7 +19,7 @@ public class AuditController {
 
     @GetMapping
     public String list(@RequestParam(defaultValue = "0") int page, Model model) {
-        var pageable = PageRequest.of(page, 50, Sort.by("createdAt").descending());
+        var pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
         model.addAttribute("logs", auditLogRepository.findAllByOrderByCreatedAtDesc(pageable));
         return "admin/audit";
     }

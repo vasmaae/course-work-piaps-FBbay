@@ -30,7 +30,7 @@ public class PatientController {
                        @RequestParam(required = false) Long sectionId,
                        @RequestParam(required = false) Patient.Gender gender,
                        @RequestParam(defaultValue = "0") int page) {
-        var pageable = PageRequest.of(page, 20, Sort.by("lastName").ascending());
+        var pageable = PageRequest.of(page, 5, Sort.by("lastName").ascending());
         model.addAttribute("patients", patientService.search(q, privilege, insuranceType, sectionId, gender, pageable));
         model.addAttribute("q", q);
         model.addAttribute("privilege", privilege);

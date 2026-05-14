@@ -28,6 +28,21 @@
             </tbody>
         </table>
     </div>
+
+    <nav th:if="${patients.totalPages > 1}" class="mt-3">
+        <ul class="pagination">
+            <li class="page-item" th:classappend="${patients.first} ? 'disabled'">
+                <a class="page-link" th:href="@{/patients/archive(page=${patients.number - 1})}">«</a>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, patients.totalPages - 1)}"
+                th:classappend="${i == patients.number} ? 'active'">
+                <a class="page-link" th:href="@{/patients/archive(page=${i})}" th:text="${i + 1}"></a>
+            </li>
+            <li class="page-item" th:classappend="${patients.last} ? 'disabled'">
+                <a class="page-link" th:href="@{/patients/archive(page=${patients.number + 1})}">»</a>
+            </li>
+        </ul>
+    </nav>
 </div>
 </body>
 </html>

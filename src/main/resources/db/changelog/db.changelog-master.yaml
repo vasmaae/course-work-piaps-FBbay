@@ -11,3 +11,6 @@ databaseChangeLog:
   - include:
       file: changes/004_demo_data.yaml
       relativeToChangelogFile: true
+  - include:
+      file: changes/005_archive_records.yaml
+      relativeToChangelogFile: true

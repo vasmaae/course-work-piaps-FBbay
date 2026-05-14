@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: "005-archive-emr-records"
+      author: dev
+      changes:
+        - sql:
+            sql: |
+              UPDATE medical_records SET is_archived = true, updated_at = NOW() - INTERVAL '10 days'
+              WHERE patient_id = (SELECT id FROM patients WHERE uin = '2026-000011');
+              UPDATE medical_records SET is_archived = true, updated_at = NOW() - INTERVAL '5 days'
+              WHERE patient_id = (SELECT id FROM patients WHERE uin = '2026-000004')
+                AND visit_date = '2026-01-22';
+              INSERT INTO audit_logs (entity_type, entity_id, action, changed_by, old_value, new_value, created_at)
+              SELECT 'MedicalRecord', id, 'ARCHIVE', 'registrar', 'active', 'archived', NOW() - INTERVAL '10 days'
+              FROM medical_records WHERE patient_id = (SELECT id FROM patients WHERE uin = '2026-000011');
+              INSERT INTO audit_logs (entity_type, entity_id, action, changed_by, old_value, new_value, created_at)
+              SELECT 'MedicalRecord', id, 'ARCHIVE', 'registrar', 'active', 'archived', NOW() - INTERVAL '5 days'
+              FROM medical_records
+              WHERE patient_id = (SELECT id FROM patients WHERE uin = '2026-000004')
+                AND visit_date = '2026-01-22';
