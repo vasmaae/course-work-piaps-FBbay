@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head><title>Пользователи</title></head>
+<body>
+<div layout:fragment="content">
+    <h2>Управление пользователями</h2>
+    <table class="table table-bordered mt-3">
+        <thead class="table-light">
+        <tr>
+            <th>ФИО</th>
+            <th>Логин</th>
+            <th>Роль</th>
+            <th>Статус</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="u : ${users}">
+            <td th:text="${u.fullName}"></td>
+            <td th:text="${u.username}"></td>
+            <td th:text="${u.role == T(com.hospital.registry.model.AppUser.Role).ADMIN ? 'Администратор' : 'Регистратор'}"></td>
+            <td>
+                <span th:if="${u.enabled}" class="badge bg-success">Активен</span>
+                <span th:unless="${u.enabled}" class="badge bg-warning text-dark">Ожидает активации</span>
+            </td>
+            <td class="text-nowrap">
+                <form th:if="${!u.enabled}" th:action="@{/admin/users/{id}/enable(id=${u.id})}" method="post" class="d-inline">
+                    <button class="btn btn-sm btn-success">Активировать</button>
+                </form>
+                <form th:if="${u.enabled}" th:action="@{/admin/users/{id}/disable(id=${u.id})}" method="post" class="d-inline">
+                    <button class="btn btn-sm btn-outline-warning">Заблокировать</button>
+                </form>
+                <form th:action="@{/admin/users/{id}/delete(id=${u.id})}" method="post" class="d-inline"
+                      onsubmit="return confirm('Удалить пользователя?')">
+                    <button class="btn btn-sm btn-outline-danger">Удалить</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

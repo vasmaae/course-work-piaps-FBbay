@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head><title>Архив ЭМК</title></head>
+<body>
+<div layout:fragment="content">
+    <h2>Архив медицинских записей</h2>
+    <div class="table-responsive mt-3">
+        <table class="table table-bordered">
+            <thead class="table-light">
+            <tr><th>Дата</th><th>Пациент</th><th>Диагноз</th><th>Врач</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="r : ${records.content}">
+                <td th:text="${#temporals.format(r.visitDate, 'dd.MM.yyyy')}"></td>
+                <td><a th:href="@{/patients/{id}(id=${r.patient.id})}" th:text="${r.patient.fullName}"></a></td>
+                <td th:text="${r.diagnosis ?: '—'}"></td>
+                <td th:text="${r.doctor?.fullName ?: '—'}"></td>
+            </tr>
+            <tr th:if="${records.empty}">
+                <td colspan="4" class="text-center text-muted">Архив пуст</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

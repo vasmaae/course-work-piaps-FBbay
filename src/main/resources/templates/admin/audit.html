@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head><title>Журнал аудита</title></head>
+<body>
+<div layout:fragment="content">
+    <h2>Журнал аудита изменений</h2>
+    <div class="table-responsive mt-3">
+        <table class="table table-bordered table-sm">
+            <thead class="table-light">
+            <tr>
+                <th>Время</th><th>Сущность</th><th>ID</th><th>Действие</th>
+                <th>Кто</th><th>Старое значение</th><th>Новое значение</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="log : ${logs.content}">
+                <td th:text="${#temporals.format(log.createdAt, 'dd.MM.yyyy HH:mm')}"></td>
+                <td th:text="${log.entityType}"></td>
+                <td th:text="${log.entityId}"></td>
+                <td>
+                    <span class="badge"
+                          th:classappend="${log.action == 'CREATE'} ? 'bg-success' : (${log.action == 'ARCHIVE'} ? 'bg-danger' : 'bg-warning text-dark')"
+                          th:text="${log.action}"></span>
+                </td>
+                <td th:text="${log.changedBy}"></td>
+                <td th:text="${log.oldValue ?: '—'}"></td>
+                <td th:text="${log.newValue ?: '—'}"></td>
+            </tr>
+            <tr th:if="${logs.empty}">
+                <td colspan="7" class="text-center text-muted">Журнал пуст</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

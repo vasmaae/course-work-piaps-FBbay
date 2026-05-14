@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head><title>Пациенты</title></head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Пациенты</h2>
+        <a th:href="@{/patients/new}" class="btn btn-success">+ Новый пациент</a>
+    </div>
+
+    <form method="get" class="mb-3">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small text-muted mb-1">Поиск по ФИО, УИН, телефону</label>
+                <input type="text" name="q" th:value="${q}" class="form-control" placeholder="Введите текст...">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted mb-1">Льгота</label>
+                <select name="privilege" class="form-select">
+                    <option value="">Все</option>
+                    <option th:each="p : ${privileges}"
+                            th:value="${p.name()}"
+                            th:text="${p.displayName}"
+                            th:selected="${p == privilege}"></option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted mb-1">Страховка</label>
+                <select name="insuranceType" class="form-select">
+                    <option value="">Все</option>
+                    <option th:each="it : ${insuranceTypes}"
+                            th:value="${it.name()}"
+                            th:text="${it.displayName}"
+                            th:selected="${it == insuranceType}"></option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted mb-1">Участок</label>
+                <select name="sectionId" class="form-select">
+                    <option value="">Все</option>
+                    <option th:each="s : ${sections}"
+                            th:value="${s.id}"
+                            th:text="${s.name}"
+                            th:selected="${s.id == sectionId}"></option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <label class="form-label small text-muted mb-1">Пол</label>
+                <select name="gender" class="form-select">
+                    <option value="">Все</option>
+                    <option th:each="g : ${genders}"
+                            th:value="${g.name()}"
+                            th:text="${g.displayName}"
+                            th:selected="${g == gender}"></option>
+                </select>
+            </div>
+            <div class="col-md-1 d-flex gap-1">
+                <button type="submit" class="btn btn-primary w-100">Найти</button>
+            </div>
+        </div>
+        <div class="mt-1">
+            <a th:href="@{/patients}" class="btn btn-sm btn-outline-secondary">Сбросить фильтры</a>
+            <span th:if="${patients.totalElements > 0}" class="text-muted small ms-2"
+                  th:text="'Найдено: ' + ${patients.totalElements}"></span>
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered">
+            <thead class="table-light">
+            <tr>
+                <th>УИН</th>
+                <th>ФИО</th>
+                <th>Дата рождения</th>
+                <th>Телефон</th>
+                <th>Участок</th>
+                <th>Льгота</th>
+                <th>Страховка</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p : ${patients.content}">
+                <td th:text="${p.uin}"></td>
+                <td><a th:href="@{/patients/{id}(id=${p.id})}" th:text="${p.fullName}"></a></td>
+                <td th:text="${#temporals.format(p.birthDate, 'dd.MM.yyyy')}"></td>
+                <td th:text="${p.phone ?: '—'}"></td>
+                <td th:text="${p.section?.name ?: '—'}"></td>
+                <td th:text="${p.privilegeCategory?.displayName ?: '—'}"></td>
+                <td th:text="${p.insuranceType?.displayName ?: '—'}"></td>
+                <td>
+                    <a th:href="@{/patients/{id}/edit(id=${p.id})}" class="btn btn-sm btn-outline-primary">Ред.</a>
+                </td>
+            </tr>
+            <tr th:if="${patients.empty}">
+                <td colspan="8" class="text-center text-muted">Пациенты не найдены</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <nav th:if="${patients.totalPages > 1}">
+        <ul class="pagination">
+            <li class="page-item" th:classappend="${patients.first} ? 'disabled'">
+                <a class="page-link" th:href="@{/patients(q=${q}, privilege=${privilege?.name()}, insuranceType=${insuranceType?.name()}, sectionId=${sectionId}, gender=${gender?.name()}, page=${patients.number - 1})}">«</a>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, patients.totalPages - 1)}"
+                th:classappend="${i == patients.number} ? 'active'">
+                <a class="page-link" th:href="@{/patients(q=${q}, privilege=${privilege?.name()}, insuranceType=${insuranceType?.name()}, sectionId=${sectionId}, gender=${gender?.name()}, page=${i})}" th:text="${i + 1}"></a>
+            </li>
+            <li class="page-item" th:classappend="${patients.last} ? 'disabled'">
+                <a class="page-link" th:href="@{/patients(q=${q}, privilege=${privilege?.name()}, insuranceType=${insuranceType?.name()}, sectionId=${sectionId}, gender=${gender?.name()}, page=${patients.number + 1})}">»</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+</body>
+</html>

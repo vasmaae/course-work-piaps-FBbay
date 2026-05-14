@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head><title>Нагрузка врачей</title></head>
+<body>
+<div layout:fragment="content">
+    <h2>Отчёт: Нагрузка медицинского персонала</h2>
+
+    <form method="get" class="row g-2 mt-2 mb-4 align-items-end">
+        <div class="col-auto">
+            <label class="form-label">С</label>
+            <input type="date" name="from" th:value="${from}" class="form-control">
+        </div>
+        <div class="col-auto">
+            <label class="form-label">По</label>
+            <input type="date" name="to" th:value="${to}" class="form-control">
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Сформировать</button>
+        </div>
+        <div class="col-auto">
+            <button type="button" class="btn btn-outline-secondary" onclick="window.print()">Печать</button>
+        </div>
+    </form>
+
+    <table class="table table-bordered">
+        <thead class="table-light">
+        <tr><th>Врач</th><th>Специализация</th><th>Количество приёмов</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="entry : ${workload}">
+            <td th:text="${entry.key.fullName}"></td>
+            <td th:text="${entry.key.specialization ?: '—'}"></td>
+            <td th:text="${entry.value}"></td>
+        </tr>
+        <tr th:if="${workload.empty}">
+            <td colspan="2" class="text-center text-muted">Нет данных</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - include:
+      file: changes/001_create_schema.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changes/002_seed_data.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changes/003_migrate_legacy.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changes/004_demo_data.yaml
+      relativeToChangelogFile: true

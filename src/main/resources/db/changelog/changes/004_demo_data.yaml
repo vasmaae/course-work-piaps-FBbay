@@ -1,0 +1,315 @@
+databaseChangeLog:
+  - changeSet:
+      id: "004-demo-doctors"
+      author: dev
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: "0"
+            sql: SELECT COUNT(*) FROM doctors
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO doctors (full_name, specialization) VALUES
+                ('Иванов Сергей Петрович', 'Терапевт'),
+                ('Смирнова Елена Владимировна', 'Кардиолог'),
+                ('Петров Андрей Николаевич', 'Хирург'),
+                ('Козлова Ольга Михайловна', 'Невролог'),
+                ('Новиков Дмитрий Александрович', 'Эндокринолог'),
+                ('Морозова Татьяна Ивановна', 'Терапевт');
+              UPDATE therapeutic_sections SET doctor_id = (SELECT id FROM doctors WHERE full_name = 'Иванов Сергей Петрович') WHERE number = 1;
+              UPDATE therapeutic_sections SET doctor_id = (SELECT id FROM doctors WHERE full_name = 'Козлова Ольга Михайловна') WHERE number = 2;
+              UPDATE therapeutic_sections SET doctor_id = (SELECT id FROM doctors WHERE full_name = 'Морозова Татьяна Ивановна') WHERE number = 3;
+
+  - changeSet:
+      id: "004-demo-patients"
+      author: dev
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: "0"
+            sql: SELECT COUNT(*) FROM patients
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO patients (uin, last_name, first_name, middle_name, gender, birth_date, phone, address,
+                section_id, privilege_category, insurance_type, insurance_number,
+                allergies, special_notes, is_archived, created_at, updated_at) VALUES
+              ('2026-000001', 'Соколов', 'Алексей', 'Дмитриевич', 'MALE', '1985-03-15', '+79161234567',
+                'г. Москва, ул. Ленина, д. 5, кв. 12',
+                (SELECT id FROM therapeutic_sections WHERE number = 1),
+                'NONE', 'OMS', '7761100000000001',
+                NULL, NULL, false, NOW() - INTERVAL '90 days', NOW() - INTERVAL '90 days'),
+              ('2026-000002', 'Федорова', 'Мария', 'Ивановна', 'FEMALE', '1960-07-22', '+79256789012',
+                'г. Москва, ул. Советская, д. 14, кв. 3',
+                (SELECT id FROM therapeutic_sections WHERE number = 1),
+                'PENSIONER', 'OMS', '7761100000000002',
+                NULL, 'Гипертоническая болезнь в анамнезе', false, NOW() - INTERVAL '85 days', NOW() - INTERVAL '20 days'),
+              ('2026-000003', 'Чернов', 'Виктор', 'Павлович', 'MALE', '1945-11-08', '+79037891234',
+                'г. Москва, ул. Победы, д. 7',
+                (SELECT id FROM therapeutic_sections WHERE number = 2),
+                'VETERAN', 'OMS', '7761100000000003',
+                NULL, NULL, false, NOW() - INTERVAL '80 days', NOW() - INTERVAL '80 days'),
+              ('2026-000004', 'Белова', 'Ольга', 'Сергеевна', 'FEMALE', '1978-05-14', '+79031234567',
+                'г. Москва, пр. Мира, д. 22, кв. 45',
+                (SELECT id FROM therapeutic_sections WHERE number = 2),
+                'NONE', 'DMS', 'ДМС-2024-00234',
+                NULL, NULL, false, NOW() - INTERVAL '75 days', NOW() - INTERVAL '15 days'),
+              ('2026-000005', 'Морозов', 'Игорь', 'Анатольевич', 'MALE', '1990-09-30', NULL,
+                'г. Москва, ул. Гагарина, д. 8',
+                (SELECT id FROM therapeutic_sections WHERE number = 3),
+                'NONE', 'OMS', '7761100000000005',
+                NULL, NULL, false, NOW() - INTERVAL '70 days', NOW() - INTERVAL '70 days'),
+              ('2026-000006', 'Крылова', 'Наталья', 'Владимировна', 'FEMALE', '1955-12-01', '+79167654321',
+                'г. Москва, ул. Строителей, д. 11',
+                (SELECT id FROM therapeutic_sections WHERE number = 3),
+                'PENSIONER', 'OMS', '7761100000000006',
+                NULL, 'Сахарный диабет 2 типа', false, NOW() - INTERVAL '65 days', NOW() - INTERVAL '10 days'),
+              ('2026-000007', 'Зайцев', 'Павел', 'Николаевич', 'MALE', '1972-04-18', '+79295551234',
+                'г. Москва, ул. Садовая, д. 3, кв. 7',
+                (SELECT id FROM therapeutic_sections WHERE number = 1),
+                'DISABLED', 'OMS', '7761100000000007',
+                'Пенициллин, аспирин', NULL, false, NOW() - INTERVAL '60 days', NOW() - INTERVAL '60 days'),
+              ('2026-000008', 'Лебедева', 'Светлана', 'Юрьевна', 'FEMALE', '1988-06-25', '+79164321567',
+                'г. Москва, Новый Арбат, д. 30',
+                (SELECT id FROM therapeutic_sections WHERE number = 2),
+                'NONE', 'DMS', 'ДМС-2024-00567',
+                NULL, NULL, false, NOW() - INTERVAL '55 days', NOW() - INTERVAL '55 days'),
+              ('2026-000009', 'Воронов', 'Михаил', 'Игоревич', 'MALE', '1950-02-14', '+79031239876',
+                NULL,
+                (SELECT id FROM therapeutic_sections WHERE number = 3),
+                'VETERAN', 'OMS', '7761100000000009',
+                NULL, 'ИБС, стенокардия напряжения', false, NOW() - INTERVAL '50 days', NOW() - INTERVAL '7 days'),
+              ('2026-000010', 'Тихонова', 'Елена', 'Александровна', 'FEMALE', '1995-08-11', '+79299871234',
+                'г. Москва, ул. Новослободская, д. 18',
+                (SELECT id FROM therapeutic_sections WHERE number = 1),
+                'NONE', 'OMS', '7761100000000010',
+                NULL, NULL, false, NOW() - INTERVAL '45 days', NOW() - INTERVAL '45 days'),
+              ('2026-000011', 'Антонов', 'Борис', 'Степанович', 'MALE', '1938-10-03', '+79161112233',
+                NULL,
+                (SELECT id FROM therapeutic_sections WHERE number = 2),
+                'DISABLED', 'OMS', '7761100000000011',
+                NULL, NULL, true, NOW() - INTERVAL '120 days', NOW() - INTERVAL '30 days'),
+              ('2026-000012', 'Громова', 'Ирина', 'Петровна', 'FEMALE', '1982-01-19', '+79165554433',
+                'г. Москва, Тверская, д. 25, кв. 8',
+                NULL,
+                'NONE', 'DMS', 'ДМС-2024-00890',
+                NULL, NULL, false, NOW() - INTERVAL '40 days', NOW() - INTERVAL '40 days');
+
+  - changeSet:
+      id: "004-demo-medical-records"
+      author: dev
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: "0"
+            sql: SELECT COUNT(*) FROM medical_records
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO medical_records (patient_id, doctor_id, created_by_id, visit_date,
+                complaints, diagnosis, icd_code, treatment, notes, is_archived, created_at, updated_at) VALUES
+              (
+                (SELECT id FROM patients WHERE uin = '2026-000001'),
+                (SELECT id FROM doctors WHERE full_name = 'Иванов Сергей Петрович'),
+                (SELECT id FROM app_users WHERE username = 'registrar'),
+                '2026-02-10',
+                'Кашель, насморк, боль в горле, температура 37.8',
+                'Острая инфекция верхних дыхательных путей',
+                'J06.9',
+                'Обильное питьё, жаропонижающие при t > 38.5°C, полоскание горла антисептиком',
+                NULL, false, NOW() - INTERVAL '80 days', NOW() - INTERVAL '80 days'
+              ),
+              (
+                (SELECT id FROM patients WHERE uin = '2026-000002'),
+                (SELECT id FROM doctors WHERE full_name = 'Иванов Сергей Петрович'),
+                (SELECT id FROM app_users WHERE username = 'registrar'),
+                '2026-01-15',
+                'Головная боль, головокружение, АД 160/100',
+                'Эссенциальная (первичная) гипертензия',
+                'I10',
+                'Амлодипин 5 мг 1 раз в день, ограничение соли',
+                'Направлена на консультацию к кардиологу', false, NOW() - INTERVAL '85 days', NOW() - INTERVAL '85 days'
+              ),
+              (
+                (SELECT id FROM patients WHERE uin = '2026-000002'),
+                (SELECT id FROM doctors WHERE full_name = 'Смирнова Елена Владимировна'),
+                (SELECT id FROM app_users WHERE username = 'registrar'),
+                '2026-03-20',
+                'Контрольный осмотр, АД 140/90, жалобы на периодические головные боли',
+                'Гипертоническая болезнь II стадии',
+                'I10',
+                'Лозартан 50 мг утром, Амлодипин 5 мг вечером, ЭКГ в динамике',
+                'Положительная динамика', false, NOW() - INTERVAL '50 days', NOW() - INTERVAL '50 days'
+              ),
+              (
+                (SELECT id FROM patients WHERE uin = '2026-000003'),
+                (SELECT id FROM doctors WHERE full_name = 'Козлова Ольга Михайловна'),
+                (SELECT id FROM app_users WHERE username = 'registrar'),
+                '2026-02-28',
+                'Боли в поясничном отделе позвоночника, усиливающиеся при движении',
+                'Боль в нижней части спины',
+                'M54.5',
+                'НПВС (Мелоксикам 15 мг), ЛФК, физиотерапия',
+                NULL, false, NOW() - INTERVAL '70 days', NOW() - INTERVAL '70 days'
+              ),
+              (
+                (SELECT id FROM patients WHERE uin = '2026-000004'),
+                (SELECT id FROM doctors WHERE full_name = 'Морозова Татьяна Ивановна'),
+                (SELECT id FROM app_users WHERE username = 'registrar'),
+                '2026-01-22',
+                'Боли в эпигастрии после еды, изжога, тошнота',
+                'Гастрит неуточнённый',
+                'K29.7',
+                'Омепразол 20 мг 2 раза в день, диета №1, Де-нол',
+                NULL, false, NOW() - INTERVAL '75 days', NOW() - INTERVAL '75 days'
+              ),
+              (
+                (SELECT id FROM patients WHERE uin = '2026-000005'),
+                (SELECT id FROM doctors WHERE full_name = 'Морозова Татьяна Ивановна'),
+                (SELECT id FROM app_users WHERE username = 'registrar'),
+                '2026-03-05',
+                'Насморк, кашель, слабость, температура 38.1',
+                'Острая инфекция верхних дыхательных путей',
+                'J06.9',
+                'Парацетамол при температуре, назальные капли, постельный режим',
+                NULL, false, NOW() - INTERVAL '60 days', NOW() - INTERVAL '60 days'
+              ),
+              (
+                (SELECT id FROM patients WHERE uin = '2026-000006'),
+                (SELECT id FROM doctors WHERE full_name = 'Новиков Дмитрий Александрович'),
+                (SELECT id FROM app_users WHERE username = 'registrar'),
+                '2026-02-14',
+                'Плановый визит. Гликированный гемоглобин 7.2%, жажда, учащённое мочеиспускание',
+                'Сахарный диабет 2 типа, целевые показатели не достигнуты',
+                'E11.9',
+                'Метформин 1000 мг 2 раза в день, коррекция диеты, контроль гликемии',
+                'ГГ в норме, продолжить текущую терапию', false, NOW() - INTERVAL '65 days', NOW() - INTERVAL '65 days'
+              ),
+              (
+                (SELECT id FROM patients WHERE uin = '2026-000006'),
+                (SELECT id FROM doctors WHERE full_name = 'Иванов Сергей Петрович'),
+                (SELECT id FROM app_users WHERE username = 'registrar'),
+                '2026-04-10',
+                'Плановый осмотр терапевта, жалоб нет',
+                'Диспансерное наблюдение',
+                'Z34.9',
+                'Продолжить лечение эндокринолога',
+                NULL, false, NOW() - INTERVAL '30 days', NOW() - INTERVAL '30 days'
+              ),
+              (
+                (SELECT id FROM patients WHERE uin = '2026-000007'),
+                (SELECT id FROM doctors WHERE full_name = 'Иванов Сергей Петрович'),
+                (SELECT id FROM app_users WHERE username = 'registrar'),
+                '2026-01-30',
+                'Кашель с мокротой, одышка при нагрузке, температура 37.5',
+                'Острый бронхит',
+                'J20.9',
+                'Амброксол 30 мг 3 раза в день, Ингавирин, обильное питьё. Без пенициллинов!',
+                'Аллергия на пенициллин и аспирин! Назначены альтернативные препараты.', false, NOW() - INTERVAL '75 days', NOW() - INTERVAL '75 days'
+              ),
+              (
+                (SELECT id FROM patients WHERE uin = '2026-000008'),
+                (SELECT id FROM doctors WHERE full_name = 'Козлова Ольга Михайловна'),
+                (SELECT id FROM app_users WHERE username = 'registrar'),
+                '2026-03-12',
+                'Приступообразные головные боли в правой половине головы, тошнота, фотофобия',
+                'Мигрень без ауры',
+                'G43.9',
+                'Суматриптан 50 мг при приступе, Топирамат 25 мг профилактически',
+                'Приступы 2–3 раза в месяц', false, NOW() - INTERVAL '55 days', NOW() - INTERVAL '55 days'
+              ),
+              (
+                (SELECT id FROM patients WHERE uin = '2026-000009'),
+                (SELECT id FROM doctors WHERE full_name = 'Смирнова Елена Владимировна'),
+                (SELECT id FROM app_users WHERE username = 'registrar'),
+                '2026-02-05',
+                'Боли за грудиной при физической нагрузке, одышка',
+                'Атеросклеротическая болезнь сердца, стабильная стенокардия',
+                'I25.1',
+                'Аторвастатин 40 мг, Бисопролол 5 мг, Ацетилсалициловая кислота 100 мг',
+                'ЭКГ: синусовый ритм, признаки гипертрофии ЛЖ', false, NOW() - INTERVAL '78 days', NOW() - INTERVAL '78 days'
+              ),
+              (
+                (SELECT id FROM patients WHERE uin = '2026-000009'),
+                (SELECT id FROM doctors WHERE full_name = 'Смирнова Елена Владимировна'),
+                (SELECT id FROM app_users WHERE username = 'registrar'),
+                '2026-04-15',
+                'Повторный осмотр. Состояние стабильное, жалобы уменьшились',
+                'Атеросклеротическая болезнь сердца',
+                'I25.1',
+                'Продолжить текущую терапию, ЭХО-КГ через 6 месяцев',
+                'Динамика положительная', false, NOW() - INTERVAL '25 days', NOW() - INTERVAL '25 days'
+              ),
+              (
+                (SELECT id FROM patients WHERE uin = '2026-000010'),
+                (SELECT id FROM doctors WHERE full_name = 'Морозова Татьяна Ивановна'),
+                (SELECT id FROM app_users WHERE username = 'registrar'),
+                '2026-03-25',
+                'Приступы свистящего дыхания, одышка при контакте с пылью',
+                'Бронхиальная астма лёгкой степени тяжести',
+                'J45.9',
+                'Сальбутамол по требованию, Беклометазон 100 мкг 2 раза в день',
+                'Направлена к аллергологу', false, NOW() - INTERVAL '45 days', NOW() - INTERVAL '45 days'
+              ),
+              (
+                (SELECT id FROM patients WHERE uin = '2026-000011'),
+                (SELECT id FROM doctors WHERE full_name = 'Козлова Ольга Михайловна'),
+                (SELECT id FROM app_users WHERE username = 'registrar'),
+                '2025-12-10',
+                'Боли в поясничном отделе, онемение левой ноги',
+                'Пояснично-крестцовая радикулопатия',
+                'M54.4',
+                'Мелоксикам, Мильгамма, физиотерапия',
+                NULL, false, NOW() - INTERVAL '115 days', NOW() - INTERVAL '115 days'
+              ),
+              (
+                (SELECT id FROM patients WHERE uin = '2026-000012'),
+                (SELECT id FROM doctors WHERE full_name = 'Петров Андрей Николаевич'),
+                (SELECT id FROM app_users WHERE username = 'registrar'),
+                '2026-04-08',
+                'Боли в правой подвздошной области, усиливаются при ходьбе',
+                'Острый аппендицит под вопросом — исключён',
+                'K37',
+                'Наблюдение, УЗИ брюшной полости, общий анализ крови в динамике',
+                'Аппендицит исключён, картина соответствует овуляторному синдрому', false, NOW() - INTERVAL '32 days', NOW() - INTERVAL '32 days'
+              );
+
+  - changeSet:
+      id: "004-demo-audit"
+      author: dev
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: "0"
+            sql: SELECT COUNT(*) FROM audit_logs
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO audit_logs (entity_type, entity_id, action, changed_by, old_value, new_value, created_at) VALUES
+              ('Patient', (SELECT id FROM patients WHERE uin = '2026-000001'), 'CREATE', 'registrar', NULL, 'Соколов Алексей Дмитриевич', NOW() - INTERVAL '90 days'),
+              ('Patient', (SELECT id FROM patients WHERE uin = '2026-000002'), 'CREATE', 'registrar', NULL, 'Федорова Мария Ивановна', NOW() - INTERVAL '85 days'),
+              ('Patient', (SELECT id FROM patients WHERE uin = '2026-000003'), 'CREATE', 'registrar', NULL, 'Чернов Виктор Павлович', NOW() - INTERVAL '80 days'),
+              ('Patient', (SELECT id FROM patients WHERE uin = '2026-000004'), 'CREATE', 'registrar', NULL, 'Белова Ольга Сергеевна', NOW() - INTERVAL '75 days'),
+              ('Patient', (SELECT id FROM patients WHERE uin = '2026-000005'), 'CREATE', 'registrar', NULL, 'Морозов Игорь Анатольевич', NOW() - INTERVAL '70 days'),
+              ('Patient', (SELECT id FROM patients WHERE uin = '2026-000006'), 'CREATE', 'registrar', NULL, 'Крылова Наталья Владимировна', NOW() - INTERVAL '65 days'),
+              ('Patient', (SELECT id FROM patients WHERE uin = '2026-000007'), 'CREATE', 'registrar', NULL, 'Зайцев Павел Николаевич', NOW() - INTERVAL '60 days'),
+              ('Patient', (SELECT id FROM patients WHERE uin = '2026-000008'), 'CREATE', 'registrar', NULL, 'Лебедева Светлана Юрьевна', NOW() - INTERVAL '55 days'),
+              ('Patient', (SELECT id FROM patients WHERE uin = '2026-000009'), 'CREATE', 'registrar', NULL, 'Воронов Михаил Игоревич', NOW() - INTERVAL '50 days'),
+              ('Patient', (SELECT id FROM patients WHERE uin = '2026-000010'), 'CREATE', 'registrar', NULL, 'Тихонова Елена Александровна', NOW() - INTERVAL '45 days'),
+              ('Patient', (SELECT id FROM patients WHERE uin = '2026-000011'), 'CREATE', 'registrar', NULL, 'Антонов Борис Степанович', NOW() - INTERVAL '120 days'),
+              ('Patient', (SELECT id FROM patients WHERE uin = '2026-000012'), 'CREATE', 'registrar', NULL, 'Громова Ирина Петровна', NOW() - INTERVAL '40 days'),
+              ('Patient', (SELECT id FROM patients WHERE uin = '2026-000002'), 'UPDATE', 'registrar', 'Федорова Мария Ивановна', 'Федорова Мария Ивановна', NOW() - INTERVAL '20 days'),
+              ('Patient', (SELECT id FROM patients WHERE uin = '2026-000004'), 'UPDATE', 'registrar', 'Белова Ольга Сергеевна', 'Белова Ольга Сергеевна', NOW() - INTERVAL '15 days'),
+              ('Patient', (SELECT id FROM patients WHERE uin = '2026-000009'), 'UPDATE', 'registrar', 'Воронов Михаил Игоревич', 'Воронов Михаил Игоревич', NOW() - INTERVAL '7 days'),
+              ('Patient', (SELECT id FROM patients WHERE uin = '2026-000011'), 'ARCHIVE', 'registrar', 'active', 'archived', NOW() - INTERVAL '30 days'),
+              ('Patient', (SELECT id FROM patients WHERE uin = '2026-000001'), 'ATTACH_SECTION', 'registrar', NULL, 'Терапевтический участок №1', NOW() - INTERVAL '89 days'),
+              ('Patient', (SELECT id FROM patients WHERE uin = '2026-000007'), 'ATTACH_SECTION', 'registrar', NULL, 'Терапевтический участок №1', NOW() - INTERVAL '59 days'),
+              ('MedicalRecord', (SELECT MIN(id) FROM medical_records WHERE patient_id = (SELECT id FROM patients WHERE uin = '2026-000001')), 'CREATE', 'registrar', NULL, 'Соколов Алексей Дмитриевич', NOW() - INTERVAL '80 days'),
+              ('MedicalRecord', (SELECT MIN(id) FROM medical_records WHERE patient_id = (SELECT id FROM patients WHERE uin = '2026-000002')), 'CREATE', 'registrar', NULL, 'Федорова Мария Ивановна', NOW() - INTERVAL '85 days'),
+              ('MedicalRecord', (SELECT MAX(id) FROM medical_records WHERE patient_id = (SELECT id FROM patients WHERE uin = '2026-000002')), 'CREATE', 'registrar', NULL, 'Федорова Мария Ивановна', NOW() - INTERVAL '50 days'),
+              ('MedicalRecord', (SELECT MIN(id) FROM medical_records WHERE patient_id = (SELECT id FROM patients WHERE uin = '2026-000003')), 'CREATE', 'registrar', NULL, 'Чернов Виктор Павлович', NOW() - INTERVAL '70 days'),
+              ('MedicalRecord', (SELECT MIN(id) FROM medical_records WHERE patient_id = (SELECT id FROM patients WHERE uin = '2026-000004')), 'CREATE', 'registrar', NULL, 'Белова Ольга Сергеевна', NOW() - INTERVAL '75 days'),
+              ('MedicalRecord', (SELECT MIN(id) FROM medical_records WHERE patient_id = (SELECT id FROM patients WHERE uin = '2026-000006')), 'CREATE', 'registrar', NULL, 'Крылова Наталья Владимировна', NOW() - INTERVAL '65 days'),
+              ('MedicalRecord', (SELECT MIN(id) FROM medical_records WHERE patient_id = (SELECT id FROM patients WHERE uin = '2026-000009')), 'CREATE', 'registrar', NULL, 'Воронов Михаил Игоревич', NOW() - INTERVAL '78 days'),
+              ('MedicalRecord', (SELECT MAX(id) FROM medical_records WHERE patient_id = (SELECT id FROM patients WHERE uin = '2026-000009')), 'CREATE', 'registrar', NULL, 'Воронов Михаил Игоревич', NOW() - INTERVAL '25 days');

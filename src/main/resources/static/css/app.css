@@ -1,0 +1,8 @@
+body { font-family: 'Segoe UI', system-ui, sans-serif; }
+
+@media print {
+    nav, .btn, form, .no-print { display: none !important; }
+    .table { font-size: 12px; }
+}
+
+.table th { white-space: nowrap; }

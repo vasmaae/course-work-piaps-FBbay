@@ -1,0 +1,51 @@
+databaseChangeLog:
+  - changeSet:
+      id: "002-seed-users"
+      author: dev
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: "0"
+            sql: SELECT COUNT(*) FROM app_users
+      changes:
+        - insert:
+            tableName: app_users
+            columns:
+              - column: {name: username, value: admin}
+              - column: {name: password_hash, value: "$2a$12$s8hP6BfPtTn84KTH2LcywubNxYrTtwMSvFi5NkMSV8Vn4xDM.vO5."}
+              - column: {name: full_name, value: "Администратор"}
+              - column: {name: role, value: ADMIN}
+              - column: {name: enabled, valueBoolean: true}
+        - insert:
+            tableName: app_users
+            columns:
+              - column: {name: username, value: registrar}
+              - column: {name: password_hash, value: "$2a$12$s8hP6BfPtTn84KTH2LcywubNxYrTtwMSvFi5NkMSV8Vn4xDM.vO5."}
+              - column: {name: full_name, value: "Иванова Анна Сергеевна"}
+              - column: {name: role, value: REGISTRAR}
+              - column: {name: enabled, valueBoolean: true}
+
+  - changeSet:
+      id: "002-seed-sections"
+      author: dev
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: "0"
+            sql: SELECT COUNT(*) FROM therapeutic_sections
+      changes:
+        - insert:
+            tableName: therapeutic_sections
+            columns:
+              - column: {name: name, value: "Терапевтический участок №1"}
+              - column: {name: number, valueNumeric: 1}
+        - insert:
+            tableName: therapeutic_sections
+            columns:
+              - column: {name: name, value: "Терапевтический участок №2"}
+              - column: {name: number, valueNumeric: 2}
+        - insert:
+            tableName: therapeutic_sections
+            columns:
+              - column: {name: name, value: "Терапевтический участок №3"}
+              - column: {name: number, valueNumeric: 3}

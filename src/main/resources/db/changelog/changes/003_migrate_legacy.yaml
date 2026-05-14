@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: "003-migrate-doctor-role"
+      author: dev
+      changes:
+        - sql:
+            sql: "UPDATE app_users SET role = 'REGISTRAR' WHERE role = 'DOCTOR'"

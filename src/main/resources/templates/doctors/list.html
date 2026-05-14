@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head><title>Врачи</title></head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Врачи</h2>
+        <a th:href="@{/doctors/new}" class="btn btn-success">+ Добавить врача</a>
+    </div>
+    <table class="table table-bordered">
+        <thead class="table-light">
+        <tr><th>ФИО</th><th>Специализация</th><th></th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="d : ${doctors}">
+            <td th:text="${d.fullName}"></td>
+            <td th:text="${d.specialization ?: '—'}"></td>
+            <td class="text-nowrap">
+                <a th:href="@{/doctors/{id}/edit(id=${d.id})}" class="btn btn-sm btn-outline-primary">Ред.</a>
+                <form th:action="@{/doctors/{id}/delete(id=${d.id})}" method="post" class="d-inline"
+                      onsubmit="return confirm('Удалить врача?')">
+                    <button class="btn btn-sm btn-outline-danger">Удалить</button>
+                </form>
+            </td>
+        </tr>
+        <tr th:if="${doctors.empty}">
+            <td colspan="3" class="text-center text-muted">Нет врачей</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

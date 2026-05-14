@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head><title>Архив пациентов</title></head>
+<body>
+<div layout:fragment="content">
+    <h2>Архив пациентов</h2>
+    <div class="table-responsive mt-3">
+        <table class="table table-bordered">
+            <thead class="table-light">
+            <tr><th>УИН</th><th>ФИО</th><th>Дата рождения</th><th></th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="p : ${patients.content}">
+                <td th:text="${p.uin}"></td>
+                <td th:text="${p.fullName}"></td>
+                <td th:text="${#temporals.format(p.birthDate, 'dd.MM.yyyy')}"></td>
+                <td>
+                    <form th:action="@{/patients/{id}/restore(id=${p.id})}" method="post">
+                        <button type="submit" class="btn btn-sm btn-success">Восстановить</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${patients.empty}">
+                <td colspan="4" class="text-center text-muted">Архив пуст</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

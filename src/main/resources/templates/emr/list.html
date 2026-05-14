@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head><title>ЭМК</title></head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2>ЭМК: <span th:text="${patient.fullName}"></span></h2>
+            <small class="text-muted" th:text="'УИН: ' + ${patient.uin}"></small>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/patients/{id}(id=${patient.id})}" class="btn btn-outline-secondary">← Пациент</a>
+            <a th:href="@{/patients/{id}/records/new(id=${patient.id})}" class="btn btn-success">+ Запись</a>
+        </div>
+    </div>
+
+    <form method="get" class="row g-2 mb-3 align-items-end">
+        <div class="col-auto">
+            <label class="form-label">С</label>
+            <input type="date" name="from" th:value="${from}" class="form-control form-control-sm">
+        </div>
+        <div class="col-auto">
+            <label class="form-label">По</label>
+            <input type="date" name="to" th:value="${to}" class="form-control form-control-sm">
+        </div>
+        <div class="col-auto">
+            <label class="form-label">Врач</label>
+            <select name="doctorId" class="form-select form-select-sm">
+                <option value="">— все —</option>
+                <option th:each="d : ${doctors}" th:value="${d.id}" th:text="${d.fullName}"
+                        th:selected="${d.id == selectedDoctorId}"></option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-sm btn-primary">Фильтр</button>
+            <a th:href="@{/patients/{id}/records(id=${patient.id})}" class="btn btn-sm btn-outline-secondary">Сброс</a>
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered">
+            <thead class="table-light">
+            <tr><th>Дата</th><th>Диагноз (МКБ)</th><th>Врач</th><th>Жалобы</th><th></th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="r : ${records.content}">
+                <td th:text="${#temporals.format(r.visitDate, 'dd.MM.yyyy')}"></td>
+                <td>
+                    <span th:if="${r.icdCode}" th:text="'[' + ${r.icdCode} + '] '" class="text-muted"></span>
+                    <span th:text="${r.diagnosis ?: '—'}"></span>
+                </td>
+                <td th:text="${r.doctor?.fullName ?: '—'}"></td>
+                <td th:text="${r.complaints != null && r.complaints.length() > 60 ? r.complaints.substring(0,60) + '...' : (r.complaints ?: '—')}"></td>
+                <td class="text-nowrap">
+                    <a th:href="@{/records/{id}/edit(id=${r.id})}" class="btn btn-sm btn-outline-primary">Ред.</a>
+                    <form th:action="@{/records/{id}/archive(id=${r.id})}" method="post" class="d-inline">
+                        <button class="btn btn-sm btn-outline-danger"
+                                onclick="return confirm('Архивировать запись?')">Арх.</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${records.empty}">
+                <td colspan="5" class="text-center text-muted">Записей нет</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
