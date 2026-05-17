@@ -32,6 +32,8 @@ public interface MedicalRecordRepository extends JpaRepository<MedicalRecord, Lo
 
     long countByDoctorIdAndVisitDateBetween(Long doctorId, LocalDate from, LocalDate to);
 
+    long countByVisitDateAndArchivedFalse(LocalDate visitDate);
+
     @org.springframework.data.jpa.repository.Query("""
         SELECT r FROM MedicalRecord r
         WHERE r.patient.id = :patientId AND r.archived = false

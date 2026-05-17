@@ -41,6 +41,8 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
 
     long countByArchivedFalse();
 
+    List<Patient> findTop5ByArchivedFalseOrderByIdDesc();
+
     @Query("SELECT p.privilegeCategory, COUNT(p) FROM Patient p WHERE p.archived = false GROUP BY p.privilegeCategory ORDER BY COUNT(p) DESC")
     List<Object[]> getPrivilegeStats();
 }

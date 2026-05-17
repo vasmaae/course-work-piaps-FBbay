@@ -5,6 +5,7 @@ import com.hospital.registry.service.DoctorService;
 import com.hospital.registry.service.MedicalRecordService;
 import com.hospital.registry.service.PatientService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,7 @@ import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class MedicalRecordController {
@@ -32,6 +34,7 @@ public class MedicalRecordController {
                        @RequestParam(required = false) Long doctorId,
                        @RequestParam(defaultValue = "0") int page,
                        Model model) {
+        log.debug("EMR list: patientId={}, from={}, to={}, doctorId={}, page={}", patientId, from, to, doctorId, page);
         var pageable = PageRequest.of(page, 5, Sort.by("visitDate").descending());
         model.addAttribute("patient", patientService.getById(patientId));
         model.addAttribute("records", recordService.getByPatient(patientId, from, to, doctorId, pageable));
@@ -44,6 +47,7 @@ public class MedicalRecordController {
 
     @GetMapping("/patients/{patientId}/records/new")
     public String newForm(@PathVariable Long patientId, Model model) {
+        log.debug("Opening new EMR form for patientId={}", patientId);
         model.addAttribute("patient", patientService.getById(patientId));
         model.addAttribute("record", new MedicalRecord());
         model.addAttribute("doctors", doctorService.getAll());
@@ -58,17 +62,21 @@ public class MedicalRecordController {
                          Model model,
                          RedirectAttributes ra) {
         if (result.hasErrors()) {
+            log.warn("EMR creation for patientId={} failed validation: {} errors", patientId, result.getErrorCount());
             model.addAttribute("patient", patientService.getById(patientId));
             model.addAttribute("doctors", doctorService.getAll());
             return "emr/form";
         }
+        log.info("Creating EMR for patientId={}, visitDate={}, doctorId={}", patientId, record.getVisitDate(), doctorId);
         recordService.create(patientId, record, doctorId);
+        log.info("EMR created for patientId={}", patientId);
         ra.addFlashAttribute("success", "Запись добавлена.");
         return "redirect:/patients/" + patientId + "/records";
     }
 
     @GetMapping("/records/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
+        log.debug("Opening edit form for EMR id={}", id);
         MedicalRecord record = recordService.getById(id);
         model.addAttribute("record", record);
         model.addAttribute("patient", record.getPatient());
@@ -84,11 +92,13 @@ public class MedicalRecordController {
                          Model model,
                          RedirectAttributes ra) {
         if (result.hasErrors()) {
+            log.warn("EMR update id={} failed validation: {} errors", id, result.getErrorCount());
             MedicalRecord existing = recordService.getById(id);
             model.addAttribute("patient", existing.getPatient());
             model.addAttribute("doctors", doctorService.getAll());
             return "emr/form";
         }
+        log.info("Updating EMR id={}", id);
         if (doctorId != null) {
             doctorService.getAll().stream()
                     .filter(d -> d.getId().equals(doctorId))
@@ -96,6 +106,7 @@ public class MedicalRecordController {
                     .ifPresent(updated::setDoctor);
         }
         MedicalRecord saved = recordService.update(id, updated);
+        log.info("EMR id={} updated", id);
         ra.addFlashAttribute("success", "Запись обновлена.");
         return "redirect:/patients/" + saved.getPatient().getId() + "/records";
     }
@@ -104,20 +115,33 @@ public class MedicalRecordController {
     public String archive(@PathVariable Long id, RedirectAttributes ra) {
         MedicalRecord record = recordService.getById(id);
         Long patientId = record.getPatient().getId();
+        log.info("Archiving EMR id={} (patientId={})", id, patientId);
         recordService.archive(id);
+        log.info("EMR id={} archived", id);
         ra.addFlashAttribute("success", "Запись архивирована.");
         return "redirect:/patients/" + patientId + "/records";
     }
 
     @GetMapping("/emr/archive")
     public String archive(@RequestParam(defaultValue = "0") int page, Model model) {
+        log.debug("EMR archive page={}", page);
         var pageable = PageRequest.of(page, 20, Sort.by("updatedAt").descending());
         model.addAttribute("records", recordService.getArchive(pageable));
         return "emr/archive";
     }
 
+    @PostMapping("/records/{id}/restore")
+    public String restore(@PathVariable Long id, RedirectAttributes ra) {
+        log.info("Restoring EMR id={}", id);
+        recordService.restore(id);
+        log.info("EMR id={} restored", id);
+        ra.addFlashAttribute("success", "Запись восстановлена.");
+        return "redirect:/emr/archive";
+    }
+
     @GetMapping("/records/{id}/voucher")
     public String printVoucher(@PathVariable Long id, Model model) {
+        log.debug("Printing voucher for EMR id={}", id);
         model.addAttribute("record", recordService.getById(id));
         return "emr/print-voucher";
     }
@@ -127,6 +151,7 @@ public class MedicalRecordController {
                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
                                Model model) {
+        log.debug("Printing extract for patientId={}, from={}, to={}", patientId, from, to);
         model.addAttribute("patient", patientService.getById(patientId));
         model.addAttribute("records", recordService.getForExtract(patientId, from, to));
         model.addAttribute("from", from);

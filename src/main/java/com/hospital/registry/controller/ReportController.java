@@ -2,6 +2,7 @@ package com.hospital.registry.controller;
 
 import com.hospital.registry.service.ReportService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 
+@Slf4j
 @Controller
 @RequestMapping("/reports")
 @RequiredArgsConstructor
@@ -27,6 +29,7 @@ public class ReportController {
         if (from == null) from = LocalDate.now().withDayOfMonth(1);
         if (to == null) to = LocalDate.now();
 
+        log.info("Report: workload from={} to={}", from, to);
         model.addAttribute("workload", reportService.getWorkloadReport(from, to));
         model.addAttribute("from", from);
         model.addAttribute("to", to);
@@ -42,6 +45,7 @@ public class ReportController {
         if (from == null) from = LocalDate.now().withDayOfMonth(1);
         if (to == null) to = LocalDate.now();
 
+        log.info("Report: vouchers from={} to={}", from, to);
         model.addAttribute("records", reportService.getRecordsByPeriod(from, to));
         model.addAttribute("from", from);
         model.addAttribute("to", to);
@@ -57,6 +61,7 @@ public class ReportController {
         if (from == null) from = LocalDate.now().minusYears(1);
         if (to == null) to = LocalDate.now();
 
+        log.info("Report: diagnoses from={} to={}", from, to);
         model.addAttribute("stats", reportService.getDiagnosisStats(from, to));
         model.addAttribute("from", from);
         model.addAttribute("to", to);
@@ -65,6 +70,7 @@ public class ReportController {
 
     @GetMapping("/privileges")
     public String privileges(Model model) {
+        log.info("Report: privileges");
         model.addAttribute("stats", reportService.getPrivilegeStats());
         model.addAttribute("total", reportService.getPrivilegeStats().stream()
                 .mapToLong(row -> (Long) row[1]).sum());

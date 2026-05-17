@@ -9,7 +9,7 @@
     <div class="table-responsive mt-3">
         <table class="table table-bordered">
             <thead class="table-light">
-            <tr><th>Дата</th><th>Пациент</th><th>Диагноз</th><th>Врач</th></tr>
+            <tr><th>Дата</th><th>Пациент</th><th>Диагноз</th><th>Врач</th><th></th></tr>
             </thead>
             <tbody>
             <tr th:each="r : ${records.content}">
@@ -17,13 +17,33 @@
                 <td><a th:href="@{/patients/{id}(id=${r.patient.id})}" th:text="${r.patient.fullName}"></a></td>
                 <td th:text="${r.diagnosis ?: '—'}"></td>
                 <td th:text="${r.doctor?.fullName ?: '—'}"></td>
+                <td>
+                    <form th:action="@{/records/{id}/restore(id=${r.id})}" method="post">
+                        <button type="submit" class="btn btn-sm btn-success">Восстановить</button>
+                    </form>
+                </td>
             </tr>
             <tr th:if="${records.empty}">
-                <td colspan="4" class="text-center text-muted">Архив пуст</td>
+                <td colspan="5" class="text-center text-muted">Архив пуст</td>
             </tr>
             </tbody>
         </table>
     </div>
+
+    <nav th:if="${records.totalPages > 1}" class="mt-3">
+        <ul class="pagination">
+            <li class="page-item" th:classappend="${records.first} ? 'disabled'">
+                <a class="page-link" th:href="@{/emr/archive(page=${records.number - 1})}">«</a>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, records.totalPages - 1)}"
+                th:classappend="${i == records.number} ? 'active'">
+                <a class="page-link" th:href="@{/emr/archive(page=${i})}" th:text="${i + 1}"></a>
+            </li>
+            <li class="page-item" th:classappend="${records.last} ? 'disabled'">
+                <a class="page-link" th:href="@{/emr/archive(page=${records.number + 1})}">»</a>
+            </li>
+        </ul>
+    </nav>
 </div>
 </body>
 </html>
