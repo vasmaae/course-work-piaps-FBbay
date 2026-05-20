@@ -15,11 +15,13 @@
             <form th:action="@{/login}" method="post">
                 <div class="mb-3">
                     <label class="form-label">Логин</label>
-                    <input type="text" name="username" class="form-control" autofocus required>
+                    <input type="text" name="username" class="form-control"
+                           maxlength="100" autofocus required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Пароль</label>
-                    <input type="password" name="password" class="form-control" required>
+                    <input type="password" name="password" class="form-control"
+                           maxlength="128" required>
                 </div>
                 <button type="submit" class="btn btn-primary w-100">Войти</button>
             </form>

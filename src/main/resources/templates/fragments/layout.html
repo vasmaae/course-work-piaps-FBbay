@@ -31,8 +31,8 @@
                 <li class="nav-item" sec:authorize="hasRole('REGISTRAR')">
                     <a class="nav-link" th:href="@{/doctors}">Врачи</a>
                 </li>
-                <!-- Общее -->
-                <li class="nav-item dropdown">
+                <!-- Администратор (отчёты) -->
+                <li class="nav-item dropdown" sec:authorize="hasRole('ADMIN')">
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Отчёты</a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" th:href="@{/reports/workload}">Нагрузка врачей</a></li>

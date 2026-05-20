@@ -23,14 +23,17 @@ public class Patient {
     private String uin;
 
     @NotBlank
-    @Column(name = "last_name", nullable = false)
+    @Size(max = 100)
+    @Column(name = "last_name", nullable = false, length = 100)
     private String lastName;
 
     @NotBlank
-    @Column(name = "first_name", nullable = false)
+    @Size(max = 100)
+    @Column(name = "first_name", nullable = false, length = 100)
     private String firstName;
 
-    @Column(name = "middle_name")
+    @Size(max = 100)
+    @Column(name = "middle_name", length = 100)
     private String middleName;
 
     @NotNull
@@ -42,7 +45,7 @@ public class Patient {
     @Column(name = "birth_date", nullable = false)
     private LocalDate birthDate;
 
-    @Pattern(regexp = "^(\\+7|8)[0-9]{10}$", message = "Введите номер в формате +7XXXXXXXXXX или 8XXXXXXXXXX")
+    @Pattern(regexp = "^((\\+7|8)[0-9]{10})?$", message = "Введите номер в формате +7XXXXXXXXXX или 8XXXXXXXXXX")
     @Column(name = "phone", length = 20)
     private String phone;
 
