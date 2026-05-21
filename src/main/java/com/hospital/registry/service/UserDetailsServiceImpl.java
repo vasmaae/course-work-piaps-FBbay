@@ -29,14 +29,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                     return new UsernameNotFoundException("User not found: " + username);
                 });
         if (!user.isEnabled()) {
-            log.warn("Authentication failed: user '{}' is disabled (pending activation)", username);
-            throw new UsernameNotFoundException("Аккаунт ожидает активации администратором");
+            log.warn("Authentication attempt: user '{}' is disabled", username);
+        } else {
+            log.debug("User '{}' loaded successfully, role={}", username, user.getRole());
         }
-        log.debug("User '{}' loaded successfully, role={}", username, user.getRole());
         return new User(
                 user.getUsername(),
                 user.getPasswordHash(),
-                true, true, true, true,
+                user.isEnabled(), true, true, true,
                 List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
         );
     }

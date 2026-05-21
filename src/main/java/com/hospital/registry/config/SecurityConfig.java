@@ -11,9 +11,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 
 @Slf4j
 @Configuration
@@ -48,11 +48,10 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationFailureHandler loginFailureHandler() {
-        SimpleUrlAuthenticationFailureHandler handler = new SimpleUrlAuthenticationFailureHandler("/login?error");
         return (request, response, exception) -> {
-            String username = request.getParameter("username");
-            log.warn("Login failed: username='{}', reason={}", username, exception.getMessage());
-            handler.onAuthenticationFailure(request, response, exception);
+            log.warn("Login failed: username='{}', reason={}", request.getParameter("username"), exception.getClass().getSimpleName());
+            String url = (exception instanceof DisabledException) ? "/login?disabled" : "/login?error";
+            response.sendRedirect(request.getContextPath() + url);
         };
     }
 

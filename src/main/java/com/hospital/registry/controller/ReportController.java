@@ -29,6 +29,11 @@ public class ReportController {
         if (from == null) from = LocalDate.now().withDayOfMonth(1);
         if (to == null) to = LocalDate.now();
 
+        if (from.isAfter(to)) {
+            LocalDate tmp = from; from = to; to = tmp;
+            model.addAttribute("dateWarning", "Начальная дата позже конечной — даты поменяны местами.");
+        }
+
         log.info("Report: workload from={} to={}", from, to);
         model.addAttribute("workload", reportService.getWorkloadReport(from, to));
         model.addAttribute("from", from);
@@ -45,6 +50,11 @@ public class ReportController {
         if (from == null) from = LocalDate.now().withDayOfMonth(1);
         if (to == null) to = LocalDate.now();
 
+        if (from.isAfter(to)) {
+            LocalDate tmp = from; from = to; to = tmp;
+            model.addAttribute("dateWarning", "Начальная дата позже конечной — даты поменяны местами.");
+        }
+
         log.info("Report: vouchers from={} to={}", from, to);
         model.addAttribute("records", reportService.getRecordsByPeriod(from, to));
         model.addAttribute("from", from);
@@ -60,6 +70,11 @@ public class ReportController {
 
         if (from == null) from = LocalDate.now().minusYears(1);
         if (to == null) to = LocalDate.now();
+
+        if (from.isAfter(to)) {
+            LocalDate tmp = from; from = to; to = tmp;
+            model.addAttribute("dateWarning", "Начальная дата позже конечной — даты поменяны местами.");
+        }
 
         log.info("Report: diagnoses from={} to={}", from, to);
         model.addAttribute("stats", reportService.getDiagnosisStats(from, to));

@@ -57,6 +57,34 @@ public class DoctorController {
         return "redirect:/doctors";
     }
 
+    @GetMapping("/{id}")
+    public String view(@PathVariable Long id, Model model) {
+        log.debug("Viewing doctor id={}", id);
+        model.addAttribute("doctor", doctorService.getById(id));
+        model.addAttribute("availableSections", doctorService.getSectionsNotAssignedToDoctor(id));
+        return "doctors/view";
+    }
+
+    @PostMapping("/{id}/attach-section")
+    public String attachSection(@PathVariable Long id,
+                                @RequestParam Long sectionId,
+                                RedirectAttributes ra) {
+        log.info("Attaching section id={} to doctor id={}", sectionId, id);
+        doctorService.attachSection(id, sectionId);
+        ra.addFlashAttribute("success", "Участок прикреплён.");
+        return "redirect:/doctors/" + id;
+    }
+
+    @PostMapping("/{id}/sections/{sectionId}/detach")
+    public String detachSection(@PathVariable Long id,
+                                @PathVariable Long sectionId,
+                                RedirectAttributes ra) {
+        log.info("Detaching section id={} from doctor id={}", sectionId, id);
+        doctorService.detachSection(id, sectionId);
+        ra.addFlashAttribute("success", "Участок откреплён.");
+        return "redirect:/doctors/" + id;
+    }
+
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable Long id, RedirectAttributes ra) {
         log.info("Deleting doctor id={}", id);

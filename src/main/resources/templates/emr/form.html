@@ -29,6 +29,8 @@
                             th:text="${d.fullName + (d.specialization != null ? ' (' + d.specialization + ')' : '')}"
                             th:selected="${record.doctor != null && record.doctor.id == d.id}"></option>
                 </select>
+                <div th:if="${patient.section != null}" class="form-text text-muted"
+                     th:text="'Участок: ' + ${patient.section.name}"></div>
             </div>
             <div class="col-md-2">
                 <label class="form-label">Код МКБ</label>

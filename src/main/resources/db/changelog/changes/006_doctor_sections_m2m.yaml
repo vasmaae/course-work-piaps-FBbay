@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: "006-create-doctor-sections-table"
+      author: dev
+      changes:
+        - createTable:
+            tableName: doctor_sections
+            columns:
+              - column:
+                  name: doctor_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_ds_doctor
+                    references: doctors(id)
+              - column:
+                  name: section_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_ds_section
+                    references: therapeutic_sections(id)
+        - addPrimaryKey:
+            tableName: doctor_sections
+            columnNames: doctor_id, section_id
+            constraintName: pk_doctor_sections
+
+  - changeSet:
+      id: "006-migrate-doctor-section-data"
+      author: dev
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO doctor_sections (doctor_id, section_id)
+              SELECT doctor_id, id FROM therapeutic_sections WHERE doctor_id IS NOT NULL;
+
+  - changeSet:
+      id: "006-drop-doctor-id-from-sections"
+      author: dev
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: therapeutic_sections
+            constraintName: fk_section_doctor
+        - dropColumn:
+            tableName: therapeutic_sections
+            columnName: doctor_id

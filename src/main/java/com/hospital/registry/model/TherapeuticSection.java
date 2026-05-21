@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,9 +25,8 @@ public class TherapeuticSection {
     @Column(name = "number", nullable = false, unique = true)
     private Integer number;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "doctor_id")
-    private Doctor doctor;
+    @ManyToMany(mappedBy = "sections", fetch = FetchType.LAZY)
+    private List<Doctor> doctors = new ArrayList<>();
 
     @OneToMany(mappedBy = "section", fetch = FetchType.LAZY)
     private List<Patient> patients;

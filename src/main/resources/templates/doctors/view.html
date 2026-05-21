@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head><title th:text="${doctor.fullName}">Врач</title></head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-start mb-3 gap-3">
+        <div class="min-w-0">
+            <h2 class="text-break-all" th:text="${doctor.fullName}"></h2>
+            <span class="text-muted" th:text="${doctor.specialization ?: 'Специализация не указана'}"></span>
+        </div>
+        <div class="d-flex gap-2 flex-shrink-0">
+            <a th:href="@{/doctors/{id}/edit(id=${doctor.id})}" class="btn btn-primary">Редактировать</a>
+            <form th:action="@{/doctors/{id}/delete(id=${doctor.id})}" method="post"
+                  onsubmit="return confirm('Удалить врача?')">
+                <button type="submit" class="btn btn-outline-danger">Удалить</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">Участки</div>
+        <div class="card-body">
+            <table class="table table-sm mb-3" th:if="${!#lists.isEmpty(doctor.sections)}">
+                <thead class="table-light">
+                <tr><th>№</th><th>Название</th><th></th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="s : ${doctor.sections}">
+                    <td th:text="${s.number}"></td>
+                    <td th:text="${s.name}"></td>
+                    <td>
+                        <form th:action="@{/doctors/{id}/sections/{sid}/detach(id=${doctor.id},sid=${s.id})}"
+                              method="post" class="d-inline">
+                            <button class="btn btn-sm btn-outline-warning">Открепить</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <p class="text-muted mb-3" th:if="${#lists.isEmpty(doctor.sections)}">Участки не прикреплены.</p>
+
+            <div th:if="${!#lists.isEmpty(availableSections)}">
+                <form th:action="@{/doctors/{id}/attach-section(id=${doctor.id})}" method="post"
+                      class="d-flex gap-2 align-items-center">
+                    <select name="sectionId" class="form-select form-select-sm" style="width: auto">
+                        <option th:each="s : ${availableSections}"
+                                th:value="${s.id}"
+                                th:text="'Участок №' + ${s.number} + ' — ' + ${s.name}"></option>
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-success">Прикрепить участок</button>
+                </form>
+            </div>
+            <p class="text-muted" th:if="${#lists.isEmpty(availableSections)}">Все участки уже прикреплены к этому врачу.</p>
+        </div>
+    </div>
+
+    <a th:href="@{/doctors}" class="btn btn-outline-secondary">← Назад к списку</a>
+</div>
+</body>
+</html>

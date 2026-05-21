@@ -1,6 +1,8 @@
 package com.hospital.registry.controller;
 
+import com.hospital.registry.model.Doctor;
 import com.hospital.registry.model.MedicalRecord;
+import com.hospital.registry.model.Patient;
 import com.hospital.registry.service.DoctorService;
 import com.hospital.registry.service.MedicalRecordService;
 import com.hospital.registry.service.PatientService;
@@ -17,6 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -48,9 +51,10 @@ public class MedicalRecordController {
     @GetMapping("/patients/{patientId}/records/new")
     public String newForm(@PathVariable Long patientId, Model model) {
         log.debug("Opening new EMR form for patientId={}", patientId);
-        model.addAttribute("patient", patientService.getById(patientId));
+        Patient patient = patientService.getById(patientId);
+        model.addAttribute("patient", patient);
         model.addAttribute("record", new MedicalRecord());
-        model.addAttribute("doctors", doctorService.getAll());
+        model.addAttribute("doctors", doctorsFor(patient));
         return "emr/form";
     }
 
@@ -63,8 +67,9 @@ public class MedicalRecordController {
                          RedirectAttributes ra) {
         if (result.hasErrors()) {
             log.warn("EMR creation for patientId={} failed validation: {} errors", patientId, result.getErrorCount());
-            model.addAttribute("patient", patientService.getById(patientId));
-            model.addAttribute("doctors", doctorService.getAll());
+            Patient patient = patientService.getById(patientId);
+            model.addAttribute("patient", patient);
+            model.addAttribute("doctors", doctorsFor(patient));
             return "emr/form";
         }
         log.info("Creating EMR for patientId={}, visitDate={}, doctorId={}", patientId, record.getVisitDate(), doctorId);
@@ -78,9 +83,10 @@ public class MedicalRecordController {
     public String editForm(@PathVariable Long id, Model model) {
         log.debug("Opening edit form for EMR id={}", id);
         MedicalRecord record = recordService.getById(id);
+        Patient patient = patientService.getById(record.getPatient().getId());
         model.addAttribute("record", record);
-        model.addAttribute("patient", record.getPatient());
-        model.addAttribute("doctors", doctorService.getAll());
+        model.addAttribute("patient", patient);
+        model.addAttribute("doctors", doctorsFor(patient));
         return "emr/form";
     }
 
@@ -94,8 +100,9 @@ public class MedicalRecordController {
         if (result.hasErrors()) {
             log.warn("EMR update id={} failed validation: {} errors", id, result.getErrorCount());
             MedicalRecord existing = recordService.getById(id);
-            model.addAttribute("patient", existing.getPatient());
-            model.addAttribute("doctors", doctorService.getAll());
+            Patient patient = patientService.getById(existing.getPatient().getId());
+            model.addAttribute("patient", patient);
+            model.addAttribute("doctors", doctorsFor(patient));
             return "emr/form";
         }
         log.info("Updating EMR id={}", id);
@@ -144,6 +151,12 @@ public class MedicalRecordController {
         log.debug("Printing voucher for EMR id={}", id);
         model.addAttribute("record", recordService.getById(id));
         return "emr/print-voucher";
+    }
+
+    private List<Doctor> doctorsFor(Patient patient) {
+        return patient.getSection() != null
+                ? doctorService.getDoctorsForSection(patient.getSection().getId())
+                : doctorService.getAll();
     }
 
     @GetMapping("/patients/{patientId}/records/extract")
