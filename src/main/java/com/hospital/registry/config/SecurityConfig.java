@@ -50,8 +50,9 @@ public class SecurityConfig {
     public AuthenticationFailureHandler loginFailureHandler() {
         return (request, response, exception) -> {
             log.warn("Login failed: username='{}', reason={}", request.getParameter("username"), exception.getClass().getSimpleName());
-            String url = (exception instanceof DisabledException) ? "/login?disabled" : "/login?error";
-            response.sendRedirect(request.getContextPath() + url);
+            String errorType = (exception instanceof DisabledException) ? "disabled" : "credentials";
+            request.getSession().setAttribute("LOGIN_ERROR", errorType);
+            response.sendRedirect(request.getContextPath() + "/login?error");
         };
     }
 

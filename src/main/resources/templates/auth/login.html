@@ -10,8 +10,8 @@
     <div class="card shadow" style="width: 360px;">
         <div class="card-body p-4">
             <h4 class="card-title text-center mb-4">🏥 Регистратура</h4>
-            <div th:if="${param.error}" class="alert alert-danger">Неверный логин или пароль.</div>
-            <div th:if="${param.disabled}" class="alert alert-warning">Ваш аккаунт заблокирован. Обратитесь к администратору.</div>
+            <div th:if="${loginError == 'credentials'}" class="alert alert-danger">Неверный логин или пароль.</div>
+            <div th:if="${loginError == 'disabled'}" class="alert alert-warning">Ваш аккаунт заблокирован. Обратитесь к администратору.</div>
             <div th:if="${param.logout}" class="alert alert-info">Вы вышли из системы.</div>
             <form th:action="@{/login}" method="post">
                 <div class="mb-3">

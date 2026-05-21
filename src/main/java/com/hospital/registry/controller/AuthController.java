@@ -1,6 +1,7 @@
 package com.hospital.registry.controller;
 
 import com.hospital.registry.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -18,7 +19,12 @@ public class AuthController {
     private final UserService userService;
 
     @GetMapping("/login")
-    public String loginPage() {
+    public String loginPage(HttpSession session, Model model) {
+        String loginError = (String) session.getAttribute("LOGIN_ERROR");
+        if (loginError != null) {
+            session.removeAttribute("LOGIN_ERROR");
+            model.addAttribute("loginError", loginError);
+        }
         return "auth/login";
     }
 
